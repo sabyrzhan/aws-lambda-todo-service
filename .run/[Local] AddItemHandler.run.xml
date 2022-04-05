@@ -1,0 +1,33 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="[Local] AddItemHandler" type="aws.lambda" factoryName="Local" nameIsGenerated="true">
+    <option name="credentialProviderId" value="profile:default" />
+    <option name="regionId" value="us-east-1" />
+    <option name="debugHost" value="localhost" />
+    <option name="architecture" value="arm64" />
+    <option name="environmentVariables">
+      <map />
+    </option>
+    <option name="handler" value="kz.sabyrzhan.awslambdatodo.AddItemHandler" />
+    <option name="image" value="false" />
+    <option name="logicalFunctionName" />
+    <option name="memorySize" value="1024" />
+    <option name="pathMappings">
+      <list />
+    </option>
+    <option name="platform" />
+    <option name="runtime" value="java11" />
+    <option name="templateFile" />
+    <option name="timeout" value="300" />
+    <option name="useTemplate" value="false" />
+    <option name="input" value="{&#10;  &quot;userId&quot; : 1,&#10;  &quot;data&quot;: &quot;Test data&quot;&#10;}" />
+    <option name="inputIsFile" value="false" />
+    <sam>
+      <option name="additionalBuildArgs" value="" />
+      <option name="additionalLocalArgs" value="" />
+      <option name="buildInContainer" value="false" />
+      <option name="dockerNetwork" value="" />
+      <option name="skipImagePull" value="false" />
+    </sam>
+    <method v="2" />
+  </configuration>
+</component>
