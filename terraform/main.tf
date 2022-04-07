@@ -37,7 +37,7 @@ resource "aws_lambda_function" "todolist_get_items_function" {
   filename = local.jar_file
   function_name = "todolist_get_items_function"
   role = aws_iam_role.todolist_lambda_role.arn
-  handler = "kz.sabyrzhan.awslambdatodo.AddItemHandler"
+  handler = "kz.sabyrzhan.awslambdatodo.GetItemsHandler"
   runtime = "java11"
   memory_size = 256
   source_code_hash = filebase64sha256(local.jar_file) #"data.archive_file.mainzip.output_base64sha256"
@@ -180,8 +180,10 @@ resource "aws_apigatewayv2_integration" "todolist_add_item_integration" {
   api_id           = aws_apigatewayv2_api.todolist_api.id
 
   integration_type = "AWS_PROXY"
+  connection_type = "INTERNET"
   integration_method = "POST"
   integration_uri = aws_lambda_function.todolist_add_item_function.invoke_arn
+  passthrough_behavior      = "WHEN_NO_MATCH"
 }
 
 resource "aws_apigatewayv2_integration" "todolist_get_items_integration" {

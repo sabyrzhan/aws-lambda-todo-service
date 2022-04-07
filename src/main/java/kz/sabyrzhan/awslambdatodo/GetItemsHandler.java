@@ -16,6 +16,9 @@ import java.util.Map;
 public class GetItemsHandler extends BaseHandler implements RequestHandler<Map<String, String>, String> {
     @Override
     public String handleRequest(Map<String, String> stringStringMap, Context context) {
+        if(true) {
+            return "{\"statusCode\": 200, \"body\": \"OK\"}";
+        }
         initDb();
         int userId = Integer.parseInt(stringStringMap.get("userId"));
         String lastCreateTsString = stringStringMap.get("lastCreateTs");
@@ -45,6 +48,6 @@ public class GetItemsHandler extends BaseHandler implements RequestHandler<Map<S
             System.out.println(next.getNumber("user_id") + " " + next.getString("data") + " " + next.getNumber("create_ts"));
         }
         System.out.println(query.getLastLowLevelResult().getQueryResult().getLastEvaluatedKey());
-        return "Finished";
+        return "{\"statusCode\": 200, \"body\": \"OK\"}";
     }
 }
