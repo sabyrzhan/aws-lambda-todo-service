@@ -4,17 +4,20 @@ import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.spec.PutItemSpec;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 import java.util.UUID;
 
-public class AddItemHandler extends BaseHandler implements RequestHandler<Map<String, String>, String> {
+public class AddItemHandler extends BaseHandler implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
     @Override
-    public String handleRequest(Map<String, String> stringStringMap, Context context) {
+    public APIGatewayV2HTTPResponse handleRequest(APIGatewayV2HTTPEvent event, Context context) {
         initDb();
-        String data = stringStringMap.get("data");
-        int userId = Integer.parseInt(stringStringMap.get("userId"));
+        var jsonBody = gson.fromJson(event.getBody(), Map.class);
+        String data = (String) jsonBody.get("data");
+        int userId = Integer.parseInt((String) jsonBody.get("userId"));
         if (StringUtils.isBlank(data)) {
             throw new RuntimeException("ERROR: data was not specified");
         }
@@ -31,6 +34,11 @@ public class AddItemHandler extends BaseHandler implements RequestHandler<Map<St
                         .withString("data", data)
                         .withNumber("create_ts", System.currentTimeMillis())
         ));
-        return "DONE";
+
+        return APIGatewayV2HTTPResponse.builder()
+                .withBody(gson.toJson(Map.of("status", 200)))
+                .withHeaders(Map.of("Content-Type", "application/json"))
+                .withStatusCode(200)
+                .build();
     }
 }

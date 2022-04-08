@@ -8,20 +8,21 @@ import com.amazonaws.services.dynamodbv2.document.internal.IteratorSupport;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayV2HTTPResponse;
+import kz.sabyrzhan.awslambdatodo.model.Todo;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GetItemsHandler extends BaseHandler implements RequestHandler<Map<String, String>, String> {
+public class GetItemsHandler extends BaseHandler implements RequestHandler<APIGatewayV2HTTPEvent, APIGatewayV2HTTPResponse> {
     @Override
-    public String handleRequest(Map<String, String> stringStringMap, Context context) {
-        if(true) {
-            return "{\"statusCode\": 200, \"body\": \"OK\"}";
-        }
+    public APIGatewayV2HTTPResponse handleRequest(APIGatewayV2HTTPEvent event, Context context) {
         initDb();
-        int userId = Integer.parseInt(stringStringMap.get("userId"));
-        String lastCreateTsString = stringStringMap.get("lastCreateTs");
+        int userId = Integer.parseInt(event.getQueryStringParameters().get("userId"));
+        String lastCreateTsString = event.getQueryStringParameters().get("lastCreateTs");
         long lastCreateTs = 0;
         if (StringUtils.isNotBlank(lastCreateTsString)) {
             lastCreateTs = Long.parseLong(lastCreateTsString);
@@ -43,11 +44,21 @@ public class GetItemsHandler extends BaseHandler implements RequestHandler<Map<S
         }
         ItemCollection<QueryOutcome> query = table.query(querySpec);
         IteratorSupport<Item, QueryOutcome> iterator = query.iterator();
+        var todoList = new ArrayList<>();
         while(iterator.hasNext()) {
             Item next = iterator.next();
-            System.out.println(next.getNumber("user_id") + " " + next.getString("data") + " " + next.getNumber("create_ts"));
+            todoList.add(
+                    Todo.builder()
+                            .userId(next.getNumber("user_id").intValue())
+                            .data(next.getString("data"))
+                            .timestamp(next.getNumber("create_ts").intValue())
+                            .build());
         }
-        System.out.println(query.getLastLowLevelResult().getQueryResult().getLastEvaluatedKey());
-        return "{\"statusCode\": 200, \"body\": \"OK\"}";
+
+        return APIGatewayV2HTTPResponse.builder()
+                .withBody(gson.toJson(todoList))
+                .withHeaders(Map.of("Content-Type", "application/json"))
+                .withStatusCode(200)
+                .build();
     }
 }
